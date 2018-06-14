@@ -76,9 +76,7 @@ const addMsSuffix = ms => `${Math.floor(ms)} ms`;
  * @param  {value}  value The metric's value.
  * @return {string} The ready to display value.
  */
-const toReadableValue = (key, value) => {
-    return BYTES_BASED_VALUES.includes(key) ? bytesToSize(value) : addMsSuffix(value);
-};
+const toReadableValue = (key, value) => (BYTES_BASED_VALUES.includes(key) ? bytesToSize(value) : addMsSuffix(value));
 
 /**
  * Build a table ready for the console output.
@@ -103,9 +101,9 @@ const buildTable = data => {
             table.push([
                 chalk.bold(entry.key),
                 toReadableValue(entry.key, entry.metrics.average),
-                toReadableValue(entry.key, entry.metrics.max),
-                toReadableValue(entry.key, entry.metrics.median),
                 toReadableValue(entry.key, entry.metrics.min),
+                toReadableValue(entry.key, entry.metrics.median),
+                toReadableValue(entry.key, entry.metrics.max),
                 toReadableValue(entry.key, entry.metrics.standardDeviation),
             ]);
         });

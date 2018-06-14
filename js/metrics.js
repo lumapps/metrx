@@ -88,12 +88,11 @@ const extractTimings = async (page, loadCompleteTimestamp) => {
         firstContentfulPaint: relevantData.firstContentfulPaint,
         responseEnd: relevantData.responseEnd,
         loadEventEnd: relevantData.loadEventEnd,
-        allDone: loadCompleteTimestamp - navigationStart,
     };
 };
 
 /**
- * Returns an object containing statistics made with extracted metrics.
+ * Returns an object containing statistics made  withextracted metrics.
  * Returns the min value, the max value, the average, the median and the standard deviation.
  *
  * @param  {Array}  data The data to aggregate.
@@ -126,9 +125,9 @@ const aggregateData = data => {
             key,
             metrics: {
                 average: getAverage(datas),
-                max: Math.max(...datas),
                 min: Math.min(...datas),
                 median: getMedian(datas),
+                max: Math.max(...datas),
                 standardDeviation: getStandardDeviation(datas),
             },
         });
