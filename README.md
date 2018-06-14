@@ -83,7 +83,7 @@ module.exports = async (page, logInfo) => {
 
     logInfo('Logging in...');
 
-    // Type credidentials.
+    // Type creditentials.
     await page.type(LOGIN_INPUT, login);
     await page.type(PASSWORD_INPUT, password);
 
