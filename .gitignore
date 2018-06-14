@@ -1,0 +1,4 @@
+node_modules
+screenshots/*.png
+.vscode
+yarn-error.log

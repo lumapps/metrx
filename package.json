@@ -1,0 +1,31 @@
+{
+    "name": "metrx",
+    "version": "1.0.0",
+    "description": "Tool to measure web page performance metrics",
+    "author": "Marc-Olivier Castagnetti <marc-olivier@lumapps.com>",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/lumapps/metrx"
+    },
+    "bugs": {
+        "url": "https://github.com/lumapps/metrx/issues"
+    },
+    "keywords": [
+        "metrics",
+        "performance",
+        "cli",
+        "measures"
+    ],
+    "main": "index.js",
+    "bin": {
+        "metrx": "./cli.js"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "chalk": "^2.4.1",
+        "cli-table": "^0.3.1",
+        "commander": "^2.15.1",
+        "ora": "^2.1.0",
+        "puppeteer": "^1.5.0"
+    }
+}
