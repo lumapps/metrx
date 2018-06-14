@@ -117,7 +117,6 @@ const aggregateData = data => {
     });
 
     const aggregatedData = [];
-    const bytesBasedValues = ['JSHeapUsedSize', 'JSHeapTotalSize'];
 
     // Then, make statistics over those metrics.
     for (const key in dataToAggregate) {
@@ -126,15 +125,11 @@ const aggregateData = data => {
         aggregatedData.push({
             key,
             metrics: {
-                average: bytesBasedValues.includes(key)
-                    ? bytesToSize(getAverage(datas))
-                    : Math.floor(getAverage(datas)),
-                max: bytesBasedValues.includes(key) ? bytesToSize(Math.max(...datas)) : Math.floor(Math.max(...datas)),
-                median: bytesBasedValues.includes(key) ? bytesToSize(getMedian(datas)) : Math.floor(getMedian(datas)),
-                min: bytesBasedValues.includes(key) ? bytesToSize(Math.min(...datas)) : Math.floor(Math.min(...datas)),
-                standardDeviation: bytesBasedValues.includes(key)
-                    ? bytesToSize(getStandardDeviation(datas))
-                    : Math.floor(getStandardDeviation(datas)),
+                average: getAverage(datas),
+                max: Math.max(...datas),
+                min: Math.min(...datas),
+                median: getMedian(datas),
+                standardDeviation: getStandardDeviation(datas),
             },
         });
     }

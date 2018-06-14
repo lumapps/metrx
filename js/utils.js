@@ -1,6 +1,8 @@
 const Table = require('cli-table');
 const chalk = require('chalk');
 
+const { BYTES_BASED_VALUES } = require('./constants');
+
 /**
  * Return the median value for an array of raw values.
  *
@@ -61,6 +63,24 @@ const bytesToSize = bytes => {
 };
 
 /**
+ * Convert raw ms values to readable values.
+ *
+ * @param   {number} ms The number of milliseconds.
+ * @returns {string} The redable value.
+ */
+const addMsSuffix = ms => `${Math.floor(ms)} ms`;
+
+/**
+ *
+ * @param  {string} key   The metric's name to display
+ * @param  {value}  value The metric's value.
+ * @return {string} The ready to display value.
+ */
+const toReadableValue = (key, value) => {
+    return BYTES_BASED_VALUES.includes(key) ? bytesToSize(value) : addMsSuffix(value);
+};
+
+/**
  * Build a table ready for the console output.
  *
  * @param {Array} data The object containing the data we want to display.
@@ -79,14 +99,14 @@ const buildTable = data => {
             head,
         });
 
-        data.forEach(o => {
+        data.forEach(entry => {
             table.push([
-                chalk.bold(o.key),
-                o.metrics.average,
-                o.metrics.max,
-                o.metrics.median,
-                o.metrics.min,
-                o.metrics.standardDeviation,
+                chalk.bold(entry.key),
+                toReadableValue(entry.key, entry.metrics.average),
+                toReadableValue(entry.key, entry.metrics.max),
+                toReadableValue(entry.key, entry.metrics.median),
+                toReadableValue(entry.key, entry.metrics.min),
+                toReadableValue(entry.key, entry.metrics.standardDeviation),
             ]);
         });
 
@@ -95,10 +115,11 @@ const buildTable = data => {
 };
 
 module.exports = {
-    getMedian,
+    buildTable,
+    bytesToSize,
     getAverage,
+    getMedian,
     getStandardDeviation,
     toCamelCase,
-    bytesToSize,
-    buildTable,
+    toReadableValue,
 };
