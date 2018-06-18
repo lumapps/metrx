@@ -1,4 +1,4 @@
-const { bytesToSize, getAverage, getMedian, getStandardDeviation, toCamelCase } = require('./utils');
+const { getAverage, getMedian, getStandardDeviation, toCamelCase } = require('./utils');
 
 /**
  * Transforms the metrics Object into a more readable object.
