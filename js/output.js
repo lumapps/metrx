@@ -65,7 +65,19 @@ const toJson = data => {
  * @return {string} The CSV ready string.
  */
 const toCsv = data => {
-    return data;
+    let csv = '';
+    const SEPARATOR = ',';
+    const NEW_LINE = '\n';
+
+    let header = Object.keys(data[0].metrics);
+
+    csv += `${SEPARATOR}${header.join(SEPARATOR)}${NEW_LINE}`;
+
+    data.forEach(metric => {
+        csv += `${metric.key}${SEPARATOR}${Object.values(metric.metrics).join(SEPARATOR)}${NEW_LINE}`;
+    });
+
+    return csv;
 };
 
 /**
