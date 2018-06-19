@@ -1,3 +1,4 @@
+const fs = require('fs');
 const Table = require('cli-table');
 const chalk = require('chalk');
 
@@ -67,18 +68,55 @@ const toCsv = data => {
     return data;
 };
 
-module.exports = (data, format) => {
+/**
+ * Writes all the extracted data in a file asynchronously.
+ *
+ * @param {Array|string} data            The previously formated data.
+ * @param {string}       [fileExtension] The file extension the file should get.
+ * @param {string}       [fileName]      The desired file name.
+ */
+const exportDataInFile = (data, fileExtension = 'txt', fileName) => {
+    fileName = fileName || `${+new Date()}.${fileExtension}`;
+
+    // Make sure we get the good file extension.
+    if (fileName.slice(-fileExtension.length) !== fileExtension) {
+        fileName += `.${fileExtension}`;
+    }
+
+    fs.writeFile(fileName, data, error => {
+        if (error) {
+            throw error;
+        }
+    });
+};
+
+module.exports = (data, format, outputFile, fileName) => {
+    let formatedData;
+    let fileExtension;
+
     switch (format) {
         case 'table':
-            return buildTable(data);
+            formatedData = buildTable(data);
+            break;
 
         case 'json':
-            return toJson(data);
+            formatedData = toJson(data);
+            fileExtension = 'json';
+            break;
 
         case 'csv':
-            return toCsv(data);
+            formatedData = toCsv(data);
+            fileExtension = 'csv';
+            break;
 
         default:
-            return data;
+            formatedData = data;
+            break;
     }
+
+    if (outputFile) {
+        exportDataInFile(formatedData, fileExtension, fileName);
+    }
+
+    return formatedData;
 };

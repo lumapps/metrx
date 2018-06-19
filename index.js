@@ -20,11 +20,12 @@ async function start({
     height = DEFAULT_VIEWPORT_SIZE.HEIGHT,
     width = DEFAULT_VIEWPORT_SIZE.WIDTH,
     outputFormat = DEFAULT_OUTPUT_FORMAT.DEFAULT,
-    takeScreenshot = false,
+    outputFile = false,
+    fileName,
     customPath,
 }) {
     // TODO: Make function to check options.
-    if (url === 'undefined' || !URL_REGEX.test(url)) {
+    if (url === undefined || !URL_REGEX.test(url)) {
         throw 'Invalid URL';
     }
 
@@ -72,21 +73,15 @@ async function start({
             await client.send('Performance.enable');
         }
 
-        const aggregatedData = await runMetricsExtracter(page, client, repeat, takeScreenshot, logStep);
+        const aggregatedData = await runMetricsExtracter(page, client, repeat, logStep);
 
         spinner.stop();
 
         await browser.close();
 
-        return output(aggregatedData, outputFormat);
+        return output(aggregatedData, outputFormat, outputFile, fileName);
     } catch (exception) {
         console.error(exception);
-
-        if (takeScreenshot) {
-            await page.screenshot({
-                path: `./screenshots/error_${+new Date()}.png`,
-            });
-        }
 
         await browser.close();
     }
