@@ -2,11 +2,34 @@ const puppeteer = require('puppeteer');
 const ora = require('ora');
 
 const runMetricsExtracter = require('./js/runner');
-const { URL_REGEX } = require('./js/constants');
 
-async function start({ url, headless, height, width, repeat, takeScreenshot, customPath }) {
-    if (url === 'undefined' || !URL_REGEX.test(url)) {
+const {
+    DEFAULT_REPEAT_TIMES,
+    DEFAULT_VIEWPORT_SIZE,
+    DEFAULT_OUTPUT_FORMAT,
+    OUTPUT_FORMATS,
+    URL_REGEX,
+} = require('./js/constants');
+
+const output = require('./js/output');
+
+async function start({
+    url,
+    repeat = DEFAULT_REPEAT_TIMES,
+    headless = true,
+    height = DEFAULT_VIEWPORT_SIZE.HEIGHT,
+    width = DEFAULT_VIEWPORT_SIZE.WIDTH,
+    outputFormat = DEFAULT_OUTPUT_FORMAT.DEFAULT,
+    outputFile = false,
+    customPath,
+}) {
+    // TODO: Make function to check options.
+    if (url === undefined || !URL_REGEX.test(url)) {
         throw 'Invalid URL';
+    }
+
+    if (!OUTPUT_FORMATS.includes(outputFormat)) {
+        throw 'Unsupported output format';
     }
 
     const spinner = ora('Launching Browser').start();
@@ -49,21 +72,15 @@ async function start({ url, headless, height, width, repeat, takeScreenshot, cus
             await client.send('Performance.enable');
         }
 
-        const aggregatedData = await runMetricsExtracter(page, client, repeat, takeScreenshot, logStep);
+        const aggregatedData = await runMetricsExtracter(page, client, repeat, logStep);
 
         spinner.stop();
 
         await browser.close();
 
-        return aggregatedData;
+        return output(aggregatedData, outputFormat, outputFile);
     } catch (exception) {
         console.error(exception);
-
-        if (takeScreenshot) {
-            await page.screenshot({
-                path: `./screenshots/error_${+new Date()}.png`,
-            });
-        }
 
         await browser.close();
     }

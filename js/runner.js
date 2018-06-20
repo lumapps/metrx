@@ -22,10 +22,9 @@ const extractAllMetrics = async (page, client, loadCompleteTimestamp) => {
  * @param  {Object}  page           The puppeteer page object we are working on.
  * @param  {Object}  client         The puppeteer client we are working with.
  * @param  {number}  repeat         The number of times we want to extract data.
- * @param  {Boolean} takeScreenshot Whether we want to take a screenshot when everithing is done.
  * @return {Object}  All collected metrics.
  */
-module.exports = async (page, client, repeat, takeScreenshot, logStep) => {
+module.exports = async (page, client, repeat, logStep) => {
     let i = 0;
     const data = [];
 
@@ -41,12 +40,6 @@ module.exports = async (page, client, repeat, takeScreenshot, logStep) => {
         data.push(await extractAllMetrics(page, client, loadCompleteTimestamp));
 
         i++;
-    }
-
-    if (takeScreenshot) {
-        await page.screenshot({
-            path: `./screenshots/${+new Date()}.png`,
-        });
     }
 
     return aggregateData(data);

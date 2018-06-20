@@ -1,6 +1,3 @@
-const Table = require('cli-table');
-const chalk = require('chalk');
-
 const { BYTES_BASED_VALUES } = require('./constants');
 
 /**
@@ -78,42 +75,7 @@ const addMsSuffix = ms => `${Math.floor(ms)} ms`;
  */
 const toReadableValue = (key, value) => (BYTES_BASED_VALUES.includes(key) ? bytesToSize(value) : addMsSuffix(value));
 
-/**
- * Build a table ready for the console output.
- *
- * @param {Array} data The object containing the data we want to display.
- */
-const buildTable = data => {
-    const head = [''].concat(Object.keys(data[0].metrics)).map(entry => {
-        return chalk.blue(entry);
-    });
-
-    for (const key in data) {
-        if (!data.hasOwnProperty(key)) {
-            return;
-        }
-
-        const table = new Table({
-            head,
-        });
-
-        data.forEach(entry => {
-            table.push([
-                chalk.bold(entry.key),
-                toReadableValue(entry.key, entry.metrics.average),
-                toReadableValue(entry.key, entry.metrics.min),
-                toReadableValue(entry.key, entry.metrics.median),
-                toReadableValue(entry.key, entry.metrics.max),
-                toReadableValue(entry.key, entry.metrics.standardDeviation),
-            ]);
-        });
-
-        return table.toString();
-    }
-};
-
 module.exports = {
-    buildTable,
     bytesToSize,
     getAverage,
     getMedian,
