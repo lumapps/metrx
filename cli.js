@@ -20,8 +20,7 @@ program
     .option('-H, --height [height]', "The viewport's height to set", DEFAULT_VIEWPORT_SIZE.HEIGHT)
     .option('-c, --custom-path [custom-path]', 'Path to custom path configuration file')
     .option('-o, --output-format [output-format]', 'The desired output format', DEFAULT_OUTPUT_FORMAT.CLI)
-    .option('--output-file', 'Whether we want to output data in a file')
-    .option('--file-name [file-name]', 'Path to the desired file in which want to export data', String)
+    .option('--output-file [output-file]', 'Whether we want to export data in a file, and the desired path to the file')
     .option('--no-headless', 'Defines if we dont want to use puppeteer headless mode')
     .parse(process.argv);
 

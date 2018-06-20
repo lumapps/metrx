@@ -21,7 +21,6 @@ async function start({
     width = DEFAULT_VIEWPORT_SIZE.WIDTH,
     outputFormat = DEFAULT_OUTPUT_FORMAT.DEFAULT,
     outputFile = false,
-    fileName,
     customPath,
 }) {
     // TODO: Make function to check options.
@@ -79,7 +78,7 @@ async function start({
 
         await browser.close();
 
-        return output(aggregatedData, outputFormat, outputFile, fileName);
+        return output(aggregatedData, outputFormat, outputFile);
     } catch (exception) {
         console.error(exception);
 

@@ -88,7 +88,7 @@ const toCsv = data => {
  * @param {string}       [fileName]      The desired file name.
  */
 const exportDataInFile = (data, fileExtension = 'txt', fileName) => {
-    fileName = fileName || `${+new Date()}.${fileExtension}`;
+    fileName = fileName === true ? `${+new Date()}.${fileExtension}` : fileName;
 
     // Make sure we get the good file extension.
     if (fileName.slice(-fileExtension.length) !== fileExtension) {
@@ -102,7 +102,7 @@ const exportDataInFile = (data, fileExtension = 'txt', fileName) => {
     });
 };
 
-module.exports = (data, format, outputFile, fileName) => {
+module.exports = (data, format, outputFile) => {
     let formatedData;
     let fileExtension;
 
@@ -127,7 +127,7 @@ module.exports = (data, format, outputFile, fileName) => {
     }
 
     if (outputFile) {
-        exportDataInFile(formatedData, fileExtension, fileName);
+        exportDataInFile(formatedData, fileExtension, outputFile);
     }
 
     return formatedData;
