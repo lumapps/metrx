@@ -43,6 +43,7 @@ Several options are available to enhance metrics at ease. Use `-h (--help)` to d
     -c, --custom-path [custom-path]      Path to custom path configuration file
     -o, --output-format [output-format]  The desired output format (default: table)
     --output-file [output-file]          Whether we want to export data in a file, and the desired path to the file
+    --wait-until [wait-until]            The waitUntil value of the Page.reload options accepted by puppeteer
     --no-headless                        Defines if we dont want to use puppeteer headless mode
     -h, --help                           output usage information
 ```
@@ -111,6 +112,18 @@ metrx localhost:8000 --output-format json --output-file ~/results.json
 ```
 
 If you don't provide any filename, a file will automatically be created in your current directory.
+
+### "Wait until" option
+
+To make a page reload, `metrx` does a `Page.reload()` from puppeteers `Page` object. This object accepts accepts a `waitUntil` parameter, which defines when the page navigation has succeded, and when the application should collect the metrics and reload the page. You can find more informations about `Page.reload()` [right here](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagereloadoptions).
+
+To use, just add `--wait-until` flag and the desired options. Since `Page.reload` accepts and `Array` of `Strings`, if you want to add multiple options, just split them with a `,`
+
+For example:
+
+```bash
+metrx localhost:8000 --wait-until networkidle0,load
+```
 
 ## Usefull Ressources
 
