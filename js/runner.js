@@ -19,12 +19,15 @@ const extractAllMetrics = async (page, client, loadCompleteTimestamp) => {
 /**
  * Extracts the page metrics as many time as the repeat parameter.
  *
- * @param  {Object}  page           The puppeteer page object we are working on.
- * @param  {Object}  client         The puppeteer client we are working with.
- * @param  {number}  repeat         The number of times we want to extract data.
+ * @param  {Object}  page      The puppeteer page object we are working on.
+ * @param  {Object}  client    The puppeteer client we are working with.
+ * @param  {number}  repeat    The number of times we want to extract data.
+ * @param  {string}  waitUntil The `waitUntil` value to set to the reload.
+ *                             See https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagereloadoptions
+ *                             for more informations.
  * @return {Object}  All collected metrics.
  */
-module.exports = async (page, client, repeat, logStep) => {
+module.exports = async (page, client, repeat, waitUntil = 'load', logStep) => {
     let i = 0;
     const data = [];
 
@@ -32,7 +35,7 @@ module.exports = async (page, client, repeat, logStep) => {
         logStep(i + 1, repeat);
 
         await page.reload({
-            waitUntil: 'load',
+            waitUntil: waitUntil.split(','),
         });
 
         const loadCompleteTimestamp = +new Date();

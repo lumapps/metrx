@@ -16,12 +16,13 @@ const output = require('./js/output');
 async function start({
     url,
     repeat = DEFAULT_REPEAT_TIMES,
-    headless = true,
     height = DEFAULT_VIEWPORT_SIZE.HEIGHT,
     width = DEFAULT_VIEWPORT_SIZE.WIDTH,
     outputFormat = DEFAULT_OUTPUT_FORMAT.DEFAULT,
     outputFile = false,
     customPath,
+    waitUntil,
+    headless = true,
 }) {
     // TODO: Make function to check options.
     if (url === undefined || !URL_REGEX.test(url)) {
@@ -72,7 +73,7 @@ async function start({
             await client.send('Performance.enable');
         }
 
-        const aggregatedData = await runMetricsExtracter(page, client, repeat, logStep);
+        const aggregatedData = await runMetricsExtracter(page, client, repeat, waitUntil, logStep);
 
         spinner.stop();
 
