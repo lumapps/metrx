@@ -23,6 +23,7 @@ program
     .option('--output-file [output-file]', 'Whether we want to export data in a file, and the desired path to the file')
     .option('--wait-until [wait-until]', 'The waitUntil value of the Page.reload options accepted by puppeteer')
     .option('--no-headless', 'Defines if we dont want to use puppeteer headless mode')
+    .option('--no-sandbox', 'Disable chrome sandbox mode, mandatory in some systems')
     .parse(process.argv);
 
 if (!program.url) {

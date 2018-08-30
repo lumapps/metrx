@@ -23,6 +23,7 @@ async function start({
     customPath,
     waitUntil,
     headless = true,
+    sandbox = true,
 }) {
     // TODO: Make function to check options.
     if (url === undefined || !URL_REGEX.test(url)) {
@@ -45,6 +46,7 @@ async function start({
 
     const browser = await puppeteer.launch({
         headless,
+        args: sandbox ? undefined : ['--no-sandbox'],
     });
 
     const page = await browser.newPage();
