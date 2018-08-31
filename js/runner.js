@@ -1,20 +1,7 @@
-const { extractMetrics, extractTimings, aggregateData } = require('./metrics');
+const PuppeteerHar = require('puppeteer-har');
 
-/**
- * Only return the metrics of the page. It combines metrics which can be
- * extracted from `window` object or from Chrome Dev Tools
- *
- * @param  {Object} page                  The puppeteer page object we are working on.
- * @param  {Object} client                The puppeteer client we are working with.
- * @param  {number} loadCompleteTimestamp The time when the reload of the page has been completed.
- * @return {Object} The full metrics object we
- */
-const extractAllMetrics = async (page, client, loadCompleteTimestamp) => {
-    return {
-        ...(await extractMetrics(page, client)),
-        ...(await extractTimings(page, loadCompleteTimestamp)),
-    };
-};
+const { extractPerformanceMetrics, extractRequestsMetrics } = require('./metrics');
+const { buildStats } = require('./utils');
 
 /**
  * Extracts the page metrics as many time as the repeat parameter.
@@ -29,21 +16,30 @@ const extractAllMetrics = async (page, client, loadCompleteTimestamp) => {
  */
 module.exports = async (page, client, repeat, waitUntil = 'load', logStep) => {
     let i = 0;
-    const data = [];
+    const pageMetrics = {};
+    const requestMetrics = {};
 
     while (i < repeat) {
         logStep(i + 1, repeat);
 
+        const har = new PuppeteerHar(page);
+        await har.start({ path: 'temp.har' });
+
+        await page.tracing.start({ path: 'trace.json' });
         await page.reload({
             waitUntil: waitUntil.split(','),
         });
 
-        const loadCompleteTimestamp = +new Date();
+        // page.on('requestfinished', request => {
+        //     extractRequestsMetrics(requestMetrics, request);
+        // });
 
-        data.push(await extractAllMetrics(page, client, loadCompleteTimestamp));
-
+        await extractPerformanceMetrics(pageMetrics, page, client);
+        await page.waitFor(1000);
+        await har.stop();
+        await page.tracing.stop();
         i++;
     }
 
-    return aggregateData(data);
+    return buildStats(pageMetrics);
 };

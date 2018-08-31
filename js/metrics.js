@@ -1,39 +1,13 @@
-const { getAverage, getMedian, getStandardDeviation, toCamelCase } = require('./utils');
+const { populateDataObject, toCamelCase, translateMetrics, getRelevantTime } = require('./utils');
 
 /**
- * Transforms the metrics Object into a more readable object.
+ * Collect and extracts performance metrics.
  *
- * @param  {Object} metrics The metrics Object we get from Chrome Dev Tools.
- * @return {Object} The correctly translated metrics.
+ * @param  {Object}  pageMetrics The object to populate.
+ * @param  {Object}  page        The puppeteer page instance we are working with.
+ * @param  {Object}  client      The puppeteer client instance we are working with.
  */
-const translateMetrics = ({ metrics }) => {
-    return metrics.reduce((obj, item) => {
-        return {
-            ...obj,
-            [item.name]: item.value,
-        };
-    }, {});
-};
-
-/**
- * Makes the diff between a time and the navigation start to get a useable time un ms.
- *
- * @param  {integer} time            The time we want the metric from
- * @param  {integer} navigationStart The navigation time.
- * @return {integer} The difference between time variable and navigation time.
- */
-const getRelevantTime = (time, navigationStart) => (time - navigationStart) * 1000;
-
-/**
- * Collect and extract metrics with the puppeteer API.
- * Those metrics are extracted from Chrome Dev Tool.
- *
- * @param  {Object} page   The puppeteer page instance we are working with.
- * @param  {Object} client The puppeteer client instance we are working with.
- * @return {Object} The extracted metrics.
- */
-const extractMetrics = async (page, client) => {
-    await client.send('Performance.enable');
+const extractPerformanceMetrics = async (pageMetrics, page, client) => {
     let firstMeaningfulPaint = 0;
     let translatedMetrics;
 
@@ -47,32 +21,30 @@ const extractMetrics = async (page, client) => {
     const navigationStart = translatedMetrics.NavigationStart;
 
     const extratedData = {
-        JSHeapUsedSize: translatedMetrics.JSHeapUsedSize,
-        JSHeapTotalSize: translatedMetrics.JSHeapTotalSize,
-        ScriptDuration: translatedMetrics.ScriptDuration * 1000,
-        FirstMeaningfulPaint: getRelevantTime(firstMeaningfulPaint, navigationStart),
-        DomContentLoaded: getRelevantTime(translatedMetrics.DomContentLoaded, navigationStart),
+        jsHeapUsedSize: translatedMetrics.JSHeapUsedSize,
+        jsHeapTotalSize: translatedMetrics.JSHeapTotalSize,
+        scriptDuration: translatedMetrics.ScriptDuration * 1000,
+        firstMeaningfulPaint: getRelevantTime(firstMeaningfulPaint, navigationStart),
+        domContentLoaded: getRelevantTime(translatedMetrics.DomContentLoaded, navigationStart),
+        ...(await extractPageTimings(page)),
     };
 
-    return extratedData;
+    populateDataObject(pageMetrics, extratedData);
 };
 
 /**
  * Extract metrics which are accessible via the `window` object.
  *
- * @param  {Object} page                  The puppeteer page instance we are working with.
- * @param  {number} loadCompleteTimestamp The time when the reload of the page has been completed.
+ * @param  {Object} page The puppeteer page instance we are working with.
  * @return {Object} The extracted relevant metrics.
  */
-const extractTimings = async (page, loadCompleteTimestamp) => {
+const extractPageTimings = async page => {
     // Get timing performance metrics from the `window` object.
     const performanceTimings = JSON.parse(await page.evaluate(() => JSON.stringify(window.performance.timing)));
     const paintTimings = JSON.parse(await page.evaluate(() => JSON.stringify(performance.getEntriesByType('paint'))));
 
     const navigationStart = performanceTimings.navigationStart;
-
     const relevantDataKeys = ['domInteractive', 'loadEventEnd', 'responseEnd'];
-
     const relevantData = {};
 
     relevantDataKeys.forEach(name => {
@@ -92,52 +64,27 @@ const extractTimings = async (page, loadCompleteTimestamp) => {
 };
 
 /**
- * Returns an object containing statistics made  withextracted metrics.
- * Returns the min value, the max value, the average, the median and the standard deviation.
+ * Gets requests relevant metrics and populates the `requestMetrics` object accordingly.
  *
- * @param  {Array}  data The data to aggregate.
- * @return {Object} The aggregated data.
+ * @param {Object}  requestMetrics The object to populate.
+ * @param {Object}  request        The puppeteer request object to get information from.
  */
-const aggregateData = data => {
-    const dataToAggregate = {};
+const extractRequestsMetrics = async (requestMetrics, request) => {
+    const response = request.response();
+    const buffer = await response.buffer();
+    const key = request.url();
 
-    // First, build an object containing each metric value in an array which has the metric name as key.
-    data.forEach(metrics => {
-        for (const key in metrics) {
-            const metric = metrics[key];
+    const extractedData = {
+        size: buffer.byteLength,
+    };
 
-            if (dataToAggregate[key]) {
-                dataToAggregate[key].push(metric);
-                continue;
-            }
+    requestMetrics[key] = requestMetrics[key] || {};
+    requestMetrics[key].tick = requestMetrics[key]++ || 1;
 
-            dataToAggregate[key] = [metric];
-        }
-    });
-
-    const aggregatedData = [];
-
-    // Then, make statistics over those metrics.
-    for (const key in dataToAggregate) {
-        const datas = dataToAggregate[key];
-
-        aggregatedData.push({
-            key,
-            metrics: {
-                average: getAverage(datas),
-                min: Math.min(...datas),
-                median: getMedian(datas),
-                max: Math.max(...datas),
-                standardDeviation: getStandardDeviation(datas),
-            },
-        });
-    }
-
-    return aggregatedData;
+    populateDataObject(requestMetrics[key].metrics, extractedData);
 };
 
 module.exports = {
-    aggregateData,
-    extractMetrics,
-    extractTimings,
+    extractPerformanceMetrics,
+    extractRequestsMetrics,
 };

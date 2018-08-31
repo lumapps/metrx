@@ -1,4 +1,4 @@
-const BYTES_BASED_VALUES = ['JSHeapUsedSize', 'JSHeapTotalSize'];
+const BYTES_BASED_VALUES = ['jsHeapUsedSize', 'jsHeapTotalSize'];
 
 const DEFAULT_REPEAT_TIMES = 5;
 
