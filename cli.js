@@ -26,15 +26,20 @@ program
     .option('--no-sandbox', 'Disable chrome sandbox mode, mandatory in some systems')
     .parse(process.argv);
 
+const errorHandler = error => {
+    console.error(error);
+    process.exit(1);
+};
+
 if (!program.url) {
     program.help();
     process.exit(1);
 } else {
     try {
-        start(program).then(output => {
+        start(program, errorHandler).then(output => {
             console.log(output);
         });
-    } catch (e) {
-        console.error(e);
+    } catch (error) {
+        errorHandler(error);
     }
 }

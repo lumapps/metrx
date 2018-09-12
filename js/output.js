@@ -3,6 +3,7 @@ const Table = require('cli-table');
 const chalk = require('chalk');
 
 const { toReadableValue } = require('./utils');
+const { RELEVANT_STATS } = require('./constants');
 
 /**
  * Build a table ready for the console output.
@@ -11,9 +12,11 @@ const { toReadableValue } = require('./utils');
  * @return {string} The ready to display table.
  */
 const buildTable = data => {
-    const head = [''].concat(Object.keys(data[0].metrics)).map(entry => {
-        return chalk.blue(entry);
-    });
+    const head = [''].concat(
+        RELEVANT_STATS.map(stat => {
+            return chalk.blue(stat);
+        }),
+    );
 
     for (const key in data) {
         if (!data.hasOwnProperty(key)) {
@@ -27,11 +30,7 @@ const buildTable = data => {
         data.forEach(entry => {
             table.push([
                 chalk.bold(entry.key),
-                toReadableValue(entry.key, entry.metrics.average),
-                toReadableValue(entry.key, entry.metrics.min),
-                toReadableValue(entry.key, entry.metrics.median),
-                toReadableValue(entry.key, entry.metrics.max),
-                toReadableValue(entry.key, entry.metrics.standardDeviation),
+                ...RELEVANT_STATS.map(stat => toReadableValue(entry.key, entry.metrics[stat])),
             ]);
         });
 
