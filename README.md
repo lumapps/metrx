@@ -2,7 +2,7 @@
 
 This tool measures any web application performances. This project uses [Puppeteer](https://github.com/GoogleChrome/puppeteer) to make painless automation.
 
-You can read this [great article](https://michaljanaszek.com/blog/test-website-performance-with-puppeteer) written by `Michał Janaszek` for further informations.
+You can read this [great article](https://michaljanaszek.com/blog/test-website-performance-with-puppeteer) written by `Michał Janaszek` for further information.
 
 <p align="center">
     <br>
@@ -20,13 +20,13 @@ npm install -g metrx
 
 ## Usage
 
-To run the application, juste use :
+To run the application, just use :
 
 ```bash
 metrx <url>
 ```
 
-Several options are available to enhance metrics at ease. Use `-h (--help)` to display them.
+Several options are available to enhance metrics easily. Use `-h (--help)` to display them.
 
 ```console
 ➜ metrx -h
@@ -46,16 +46,16 @@ Several options are available to enhance metrics at ease. Use `-h (--help)` to d
     --wait-until [wait-until]            The waitUntil value of the Page.reload options accepted by puppeteer
     --no-headless                        Defines if we dont want to use puppeteer headless mode
     --no-sandbox                         Disable chrome sandbox mode, mandatory in some systems
-    -h, --help                           output usage information
+    -h, --help                           Output usage information
 ```
 
 ### Custom user path
 
-A custom file path can be set in the cli options. That way, you can tell puppeteer what he should do before measuring any kind of metric.
+A custom file path can be set in the cli options. That way, you can tell puppeteer what it should do before measuring any kind of metric.
 
-This option can be usefull if you need to be logged in before beeing able to access to your application.
+This option can be useful if you need to be logged in before being able to access your application.
 
-To include your file into the proccess, juste use `-c <relative path to your file>` option.
+To include your file into the process, just use `-c <relative path to your file>` option.
 
 ```bash
 metrx localhost:8000 -c '../../custom-path.js'
@@ -98,15 +98,15 @@ module.exports = async (page, logInfo) => {
 };
 ```
 
-Those functions have accessed to two arguments :
+Those functions have access to two arguments :
 
--   `page` (The `Page` puppeteer object to be able to access to the full [puppeteer page instance API](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#class-page))
+-   `page` (The `Page` puppeteer object to be able to access the full [puppeteer page instance API](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#class-page))
 -   `logInfo` (To log custom informations)
 
-### Export data in a file
+### Export data to a file
 
-You can choose to export in multiple formats and export formated data in a file. For now, only `table`, `raw`, `json` and `csv` are available.
-`table` and `raw` data will be exported in a `txt` file. To use it, just type.
+You can choose to export to multiple formats and export formated data to a file. For now, only `table`, `raw`, `json` and `csv` are available.
+`table` and `raw` data will be exported to a `txt` file. To use it, just type :
 
 ```bash
 metrx localhost:8000 --output-format json --output-file ~/results.json
@@ -116,9 +116,9 @@ If you don't provide any filename, a file will automatically be created in your 
 
 ### "Wait until" option
 
-To make a page reload, `metrx` does a `Page.reload()` from puppeteers `Page` object. This object accepts accepts a `waitUntil` parameter, which defines when the page navigation has succeded, and when the application should collect the metrics and reload the page. You can find more informations about `Page.reload()` [right here](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagereloadoptions).
+To make a page reload, `metrx` does a `Page.reload()` from puppeteer's `Page` object. This object accepts a `waitUntil` parameter, which defines when the page navigation has succeeded, and when the application should collect the metrics and reload the page. You can find more information about `Page.reload()` [right here](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagereloadoptions).
 
-To use, just add `--wait-until` flag and the desired options. Since `Page.reload` accepts and `Array` of `Strings`, if you want to add multiple options, just split them with a `,`
+To use, just add the `--wait-until` flag and the desired options. Since `Page.reload` accepts either a `String` or an `Array` of `Strings`, if you want to add multiple values, just split them with a `,`
 
 For example:
 
@@ -128,7 +128,7 @@ metrx localhost:8000 --wait-until networkidle0,load
 
 ## Development
 
-To contribute, just run the folowing commands :
+To contribute, just run the following commands :
 
 ```shell
 git clone https://github.com/lumapps/metrx.git
@@ -144,7 +144,7 @@ Then, to use `metrx` just run it via `cli.js`, for example :
 ./cli.js localhost:8000
 ```
 
-## Usefull Ressources
+## Useful Resources
 
 -   [Commander documentation](https://github.com/tj/commander.js)
 -   [Puppeteer API](https://pptr.dev/)
