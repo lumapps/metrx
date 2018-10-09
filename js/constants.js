@@ -1,4 +1,4 @@
-const BYTES_BASED_VALUES = ['JSHeapUsedSize', 'JSHeapTotalSize'];
+const BYTES_BASED_VALUES = ['jsHeapUsedSize', 'jsHeapTotalSize'];
 
 const DEFAULT_REPEAT_TIMES = 5;
 
@@ -14,6 +14,8 @@ const DEFAULT_OUTPUT_FORMAT = {
 
 const OUTPUT_FORMATS = ['raw', 'json', 'table', 'csv'];
 
+const RELEVANT_STATS = ['average', 'median', 'min', 'max', 'standardDeviation'];
+
 const URL_REGEX = /([a-z]{1,2}tps?):\/\/((?:(?!(?:\/|#|\?|&)).)+)(?:(\/(?:(?:(?:(?!(?:#|\?|&)).)+\/))?))?(?:((?:(?!(?:\.|$|\?|#)).)+))?(?:(\.(?:(?!(?:\?|$|#)).)+))?(?:(\?(?:(?!(?:$|#)).)+))?(?:(#.+))?/g;
 
 module.exports = {
@@ -22,5 +24,6 @@ module.exports = {
     DEFAULT_REPEAT_TIMES,
     DEFAULT_OUTPUT_FORMAT,
     OUTPUT_FORMATS,
+    RELEVANT_STATS,
     URL_REGEX,
 };

@@ -1,37 +1,41 @@
-const { BYTES_BASED_VALUES } = require('./constants');
+const { BYTES_BASED_VALUES, RELEVANT_STATS } = require('./constants');
+const statsFunction = require('./stats');
 
 /**
- * Return the median value for an array of raw values.
+ * Convert raw ms values to readable values.
  *
- * @param  {Array}  values The array of values.
- * @return {number} The median value.
+ * @param   {number} ms The number of milliseconds.
+ * @returns {string} The readable value.
  */
-const getMedian = values => {
-    values.sort((a, b) => a - b);
-    const pivot = Math.floor(values.length / 2);
-
-    return values.length % 2 ? values[pivot] : (values[pivot - 1] + values[pivot]) / 2;
-};
+const addMsSuffix = ms => `${Math.floor(ms)} ms`;
 
 /**
- * Calculate the average value for an array of raw values.
+ * Makes the diff between a time and the navigation start to get a usable time in ms.
  *
- * @param  {Array}  values The array of values.
- * @return {number} The average value.
+ * @param  {integer} time            The time we want the metric from.
+ * @param  {integer} navigationStart The navigation time.
+ * @return {integer} The difference between time variable and navigation time.
  */
-const getAverage = values => values.reduce((a, b) => a + b, 0) / values.length;
+const getRelevantTime = (time, navigationStart) => (time - navigationStart) * 1000;
 
 /**
- * Calculate standard deviation for an array of raw values.
+ * Populates a data object. An array of values will be associated to each key.
  *
- * @param  {Array}  values The array of values to get the standard deviation from.
- * @return {number} The stantdard deviation.
+ * @param {Object} objectToPopulate The object containing all the data as key => Array<value>
+ * @param {Object} dataObject       The object contanin the key => value pair.
  */
-const getStandardDeviation = values => {
-    const avg = getAverage(values);
-    const squareDiffs = values.map(value => Math.pow(value - avg, 2));
+const populateDataObject = (objectToPopulate, dataObject) => {
+    objectToPopulate = objectToPopulate || {};
 
-    return Math.sqrt(getAverage(squareDiffs));
+    for (const key in dataObject) {
+        const value = dataObject[key];
+
+        if (objectToPopulate[key]) {
+            objectToPopulate[key].push(value);
+        } else {
+            objectToPopulate[key] = [value];
+        }
+    }
 };
 
 /**
@@ -43,6 +47,62 @@ const toCamelCase = value => {
     return value.replace(/(\-[a-z])/g, function($1) {
         return $1.toUpperCase().replace('-', '');
     });
+};
+
+/**
+ * Humanize values.
+ *
+ * @param  {string} key   The metric's name to display
+ * @param  {value}  value The metric's value.
+ * @return {string} The ready to display value.
+ */
+const toReadableValue = (key, value) => (BYTES_BASED_VALUES.includes(key) ? bytesToSize(value) : addMsSuffix(value));
+
+/**
+ * Transforms the metrics Object into a more readable object.
+ *
+ * @param  {Object} metrics The metrics Object we get from Chrome Dev Tools.
+ * @return {Object} The correctly translated metrics.
+ */
+const translateMetrics = ({ metrics }) => {
+    return metrics.reduce((obj, item) => {
+        return {
+            ...obj,
+            [item.name]: item.value,
+        };
+    }, {});
+};
+
+/**
+ * Returns an array containing statistics made with extracted metrics.
+ * Returns the min value, the max value, the average, the median and the standard deviation for each collected metric.
+ *
+ * @param  {Array}  data The data we'll build the stats on.
+ * @return {Array}  The aggregated data.
+ */
+const buildStats = data => {
+    const aggregatedData = [];
+
+    // Then, make statistics over those metrics.
+    for (const key in data) {
+        const datas = data[key];
+        const metrics = {};
+
+        RELEVANT_STATS.map(stat => {
+            const functionName = `get${stat.charAt(0).toUpperCase()}${stat.slice(1)}`;
+
+            if (statsFunction[functionName] instanceof Function) {
+                metrics[stat] = statsFunction[functionName](datas);
+            }
+        });
+
+        aggregatedData.push({
+            key,
+            metrics,
+        });
+    }
+
+    return aggregatedData;
 };
 
 /**
@@ -59,27 +119,12 @@ const bytesToSize = bytes => {
     return `${parseFloat(bytes / Math.pow(1024, i)).toFixed(2)} ${sizes[i]}`;
 };
 
-/**
- * Convert raw ms values to readable values.
- *
- * @param   {number} ms The number of milliseconds.
- * @returns {string} The redable value.
- */
-const addMsSuffix = ms => `${Math.floor(ms)} ms`;
-
-/**
- *
- * @param  {string} key   The metric's name to display
- * @param  {value}  value The metric's value.
- * @return {string} The ready to display value.
- */
-const toReadableValue = (key, value) => (BYTES_BASED_VALUES.includes(key) ? bytesToSize(value) : addMsSuffix(value));
-
 module.exports = {
     bytesToSize,
-    getAverage,
-    getMedian,
-    getStandardDeviation,
+    buildStats,
+    getRelevantTime,
+    populateDataObject,
     toCamelCase,
     toReadableValue,
+    translateMetrics,
 };

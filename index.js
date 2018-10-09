@@ -13,25 +13,28 @@ const {
 
 const output = require('./js/output');
 
-async function start({
-    url,
-    repeat = DEFAULT_REPEAT_TIMES,
-    height = DEFAULT_VIEWPORT_SIZE.HEIGHT,
-    width = DEFAULT_VIEWPORT_SIZE.WIDTH,
-    outputFormat = DEFAULT_OUTPUT_FORMAT.DEFAULT,
-    outputFile = false,
-    customPath,
-    waitUntil,
-    headless = true,
-    sandbox = true,
-}) {
+module.exports = async function start(
+    {
+        url,
+        repeat = DEFAULT_REPEAT_TIMES,
+        height = DEFAULT_VIEWPORT_SIZE.HEIGHT,
+        width = DEFAULT_VIEWPORT_SIZE.WIDTH,
+        outputFormat = DEFAULT_OUTPUT_FORMAT.DEFAULT,
+        outputFile = false,
+        customPath,
+        waitUntil,
+        headless = true,
+        sandbox = true,
+    },
+    errorHandler,
+) {
     // TODO: Make function to check options.
     if (url === undefined || !URL_REGEX.test(url)) {
-        throw 'Invalid URL';
+        errorHandler(Error('Invalid URL'));
     }
 
     if (!OUTPUT_FORMATS.includes(outputFormat)) {
-        throw 'Unsupported output format';
+        errorHandler(Error('Unsupported output format'));
     }
 
     const spinner = ora('Launching Browser').start();
@@ -68,7 +71,7 @@ async function start({
         // If we want tu use a custom url, reach it before making metrics.
         logInfo(`Testing ${url}...`);
 
-        await page.goto(url);
+        await page.goto(url).catch(errorHandler);
 
         if (!client) {
             client = await page.target().createCDPSession();
@@ -82,11 +85,8 @@ async function start({
         await browser.close();
 
         return output(aggregatedData, outputFormat, outputFile);
-    } catch (exception) {
-        console.error(exception);
-
+    } catch (error) {
         await browser.close();
+        errorHandler(error);
     }
-}
-
-module.exports = params => start(params);
+};
