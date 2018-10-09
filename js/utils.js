@@ -5,14 +5,14 @@ const statsFunction = require('./stats');
  * Convert raw ms values to readable values.
  *
  * @param   {number} ms The number of milliseconds.
- * @returns {string} The redable value.
+ * @returns {string} The readable value.
  */
 const addMsSuffix = ms => `${Math.floor(ms)} ms`;
 
 /**
- * Makes the diff between a time and the navigation start to get a useable time in ms.
+ * Makes the diff between a time and the navigation start to get a usable time in ms.
  *
- * @param  {integer} time            The time we want the metric from
+ * @param  {integer} time            The time we want the metric from.
  * @param  {integer} navigationStart The navigation time.
  * @return {integer} The difference between time variable and navigation time.
  */

@@ -12,11 +12,7 @@ const { RELEVANT_STATS } = require('./constants');
  * @return {string} The ready to display table.
  */
 const buildTable = data => {
-    const head = [''].concat(
-        RELEVANT_STATS.map(stat => {
-            return chalk.blue(stat);
-        }),
-    );
+    const head = [''].concat(RELEVANT_STATS.map(stat => chalk.blue(stat)));
 
     for (const key in data) {
         if (!data.hasOwnProperty(key)) {
